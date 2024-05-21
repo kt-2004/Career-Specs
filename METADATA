@@ -1,246 +1,131 @@
 Metadata-Version: 2.1
-Name: asgiref
-Version: 3.7.2
-Summary: ASGI specs, helper code, and adapters
-Home-page: https://github.com/django/asgiref/
-Author: Django Software Foundation
-Author-email: foundation@djangoproject.com
-License: BSD-3-Clause
-Project-URL: Documentation, https://asgi.readthedocs.io/
-Project-URL: Further Documentation, https://docs.djangoproject.com/en/stable/topics/async/#async-adapter-functions
-Project-URL: Changelog, https://github.com/django/asgiref/blob/master/CHANGELOG.txt
+Name: mysqlclient
+Version: 2.2.4
+Summary: Python interface to MySQL
+Author-email: Inada Naoki <songofacandy@gmail.com>
+License: GNU General Public License v2 (GPLv2)
+Project-URL: Project, https://github.com/PyMySQL/mysqlclient
+Project-URL: Documentation, https://mysqlclient.readthedocs.io/
+Keywords: MySQL
 Classifier: Development Status :: 5 - Production/Stable
-Classifier: Environment :: Web Environment
-Classifier: Intended Audience :: Developers
-Classifier: License :: OSI Approved :: BSD License
+Classifier: Environment :: Other Environment
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows :: Windows NT/2000
 Classifier: Operating System :: OS Independent
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: C
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3 :: Only
-Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Programming Language :: Python :: 3.11
-Classifier: Topic :: Internet :: WWW/HTTP
-Requires-Python: >=3.7
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Database
+Classifier: Topic :: Database :: Database Engines/Servers
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: typing-extensions (>=4) ; python_version < "3.11"
-Provides-Extra: tests
-Requires-Dist: pytest ; extra == 'tests'
-Requires-Dist: pytest-asyncio ; extra == 'tests'
-Requires-Dist: mypy (>=0.800) ; extra == 'tests'
 
-asgiref
-=======
+# mysqlclient
 
-.. image:: https://api.travis-ci.org/django/asgiref.svg
-    :target: https://travis-ci.org/django/asgiref
+This project is a fork of [MySQLdb1](https://github.com/farcepest/MySQLdb1).
+This project adds Python 3 support and fixed many bugs.
 
-.. image:: https://img.shields.io/pypi/v/asgiref.svg
-    :target: https://pypi.python.org/pypi/asgiref
+* PyPI: https://pypi.org/project/mysqlclient/
+* GitHub: https://github.com/PyMySQL/mysqlclient
 
-ASGI is a standard for Python asynchronous web apps and servers to communicate
-with each other, and positioned as an asynchronous successor to WSGI. You can
-read more at https://asgi.readthedocs.io/en/latest/
 
-This package includes ASGI base libraries, such as:
+## Support
 
-* Sync-to-async and async-to-sync function wrappers, ``asgiref.sync``
-* Server base classes, ``asgiref.server``
-* A WSGI-to-ASGI adapter, in ``asgiref.wsgi``
+**Do Not use Github Issue Tracker to ask help.  OSS Maintainer is not free tech support**
 
+When your question looks relating to Python rather than MySQL:
 
-Function wrappers
------------------
+* Python mailing list [python-list](https://mail.python.org/mailman/listinfo/python-list)
+* Slack [pythondev.slack.com](https://pyslackers.com/web/slack)
 
-These allow you to wrap or decorate async or sync functions to call them from
-the other style (so you can call async functions from a synchronous thread,
-or vice-versa).
+Or when you have question about MySQL:
 
-In particular:
+* [MySQL Community on Slack](https://lefred.be/mysql-community-on-slack/)
 
-* AsyncToSync lets a synchronous subthread stop and wait while the async
-  function is called on the main thread's event loop, and then control is
-  returned to the thread when the async function is finished.
 
-* SyncToAsync lets async code call a synchronous function, which is run in
-  a threadpool and control returned to the async coroutine when the synchronous
-  function completes.
+## Install
 
-The idea is to make it easier to call synchronous APIs from async code and
-asynchronous APIs from synchronous code so it's easier to transition code from
-one style to the other. In the case of Channels, we wrap the (synchronous)
-Django view system with SyncToAsync to allow it to run inside the (asynchronous)
-ASGI server.
+### Windows
 
-Note that exactly what threads things run in is very specific, and aimed to
-keep maximum compatibility with old synchronous code. See
-"Synchronous code & Threads" below for a full explanation. By default,
-``sync_to_async`` will run all synchronous code in the program in the same
-thread for safety reasons; you can disable this for more performance with
-``@sync_to_async(thread_sensitive=False)``, but make sure that your code does
-not rely on anything bound to threads (like database connections) when you do.
+Building mysqlclient on Windows is very hard.
+But there are some binary wheels you can install easily.
 
+If binary wheels do not exist for your version of Python, it may be possible to
+build from source, but if this does not work, **do not come asking for support.**
+To build from source, download the
+[MariaDB C Connector](https://mariadb.com/downloads/#connectors) and install
+it. It must be installed in the default location
+(usually "C:\Program Files\MariaDB\MariaDB Connector C" or
+"C:\Program Files (x86)\MariaDB\MariaDB Connector C" for 32-bit). If you
+build the connector yourself or install it in a different location, set the
+environment variable `MYSQLCLIENT_CONNECTOR` before installing. Once you have
+the connector installed and an appropriate version of Visual Studio for your
+version of Python:
 
-Threadlocal replacement
------------------------
+```
+$ pip install mysqlclient
+```
 
-This is a drop-in replacement for ``threading.local`` that works with both
-threads and asyncio Tasks. Even better, it will proxy values through from a
-task-local context to a thread-local context when you use ``sync_to_async``
-to run things in a threadpool, and vice-versa for ``async_to_sync``.
+### macOS (Homebrew)
 
-If you instead want true thread- and task-safety, you can set
-``thread_critical`` on the Local object to ensure this instead.
+Install MySQL and mysqlclient:
 
+```bash
+$ # Assume you are activating Python 3 venv
+$ brew install mysql pkg-config
+$ pip install mysqlclient
+```
 
-Server base classes
--------------------
+If you don't want to install MySQL server, you can use mysql-client instead:
 
-Includes a ``StatelessServer`` class which provides all the hard work of
-writing a stateless server (as in, does not handle direct incoming sockets
-but instead consumes external streams or sockets to work out what is happening).
+```bash
+$ # Assume you are activating Python 3 venv
+$ brew install mysql-client pkg-config
+$ export PKG_CONFIG_PATH="$(brew --prefix)/opt/mysql-client/lib/pkgconfig"
+$ pip install mysqlclient
+```
 
-An example of such a server would be a chatbot server that connects out to
-a central chat server and provides a "connection scope" per user chatting to
-it. There's only one actual connection, but the server has to separate things
-into several scopes for easier writing of the code.
+### Linux
 
-You can see an example of this being used in `frequensgi <https://github.com/andrewgodwin/frequensgi>`_.
+**Note that this is a basic step.  I can not support complete step for build for all
+environment.  If you can see some error, you should fix it by yourself, or ask for
+support in some user forum.  Don't file a issue on the issue tracker.**
 
+You may need to install the Python 3 and MySQL development headers and libraries like so:
 
-WSGI-to-ASGI adapter
---------------------
+* `$ sudo apt-get install python3-dev default-libmysqlclient-dev build-essential pkg-config`  # Debian / Ubuntu
+* `% sudo yum install python3-devel mysql-devel pkgconfig`  # Red Hat / CentOS
 
-Allows you to wrap a WSGI application so it appears as a valid ASGI application.
+Then you can install mysqlclient via pip now:
 
-Simply wrap it around your WSGI application like so::
+```
+$ pip install mysqlclient
+```
 
-    asgi_application = WsgiToAsgi(wsgi_application)
+### Customize build (POSIX)
 
-The WSGI application will be run in a synchronous threadpool, and the wrapped
-ASGI application will be one that accepts ``http`` class messages.
+mysqlclient uses `pkg-config --cflags --ldflags mysqlclient` by default for finding
+compiler/linker flags.
 
-Please note that not all extended features of WSGI may be supported (such as
-file handles for incoming POST bodies).
+You can use `MYSQLCLIENT_CFLAGS` and `MYSQLCLIENT_LDFLAGS` environment
+variables to customize compiler/linker options.
 
+```bash
+$ export MYSQLCLIENT_CFLAGS=`pkg-config mysqlclient --cflags`
+$ export MYSQLCLIENT_LDFLAGS=`pkg-config mysqlclient --libs`
+$ pip install mysqlclient
+```
 
-Dependencies
-------------
+### Documentation
 
-``asgiref`` requires Python 3.7 or higher.
-
-
-Contributing
-------------
-
-Please refer to the
-`main Channels contributing docs <https://github.com/django/channels/blob/master/CONTRIBUTING.rst>`_.
-
-
-Testing
-'''''''
-
-To run tests, make sure you have installed the ``tests`` extra with the package::
-
-    cd asgiref/
-    pip install -e .[tests]
-    pytest
-
-
-Building the documentation
-''''''''''''''''''''''''''
-
-The documentation uses `Sphinx <http://www.sphinx-doc.org>`_::
-
-    cd asgiref/docs/
-    pip install sphinx
-
-To build the docs, you can use the default tools::
-
-    sphinx-build -b html . _build/html  # or `make html`, if you've got make set up
-    cd _build/html
-    python -m http.server
-
-...or you can use ``sphinx-autobuild`` to run a server and rebuild/reload
-your documentation changes automatically::
-
-    pip install sphinx-autobuild
-    sphinx-autobuild . _build/html
-
-
-Releasing
-'''''''''
-
-To release, first add details to CHANGELOG.txt and update the version number in ``asgiref/__init__.py``.
-
-Then, build and push the packages::
-
-    python -m build
-    twine upload dist/*
-    rm -r build/ dist/
-
-
-Implementation Details
-----------------------
-
-Synchronous code & threads
-''''''''''''''''''''''''''
-
-The ``asgiref.sync`` module provides two wrappers that let you go between
-asynchronous and synchronous code at will, while taking care of the rough edges
-for you.
-
-Unfortunately, the rough edges are numerous, and the code has to work especially
-hard to keep things in the same thread as much as possible. Notably, the
-restrictions we are working with are:
-
-* All synchronous code called through ``SyncToAsync`` and marked with
-  ``thread_sensitive`` should run in the same thread as each other (and if the
-  outer layer of the program is synchronous, the main thread)
-
-* If a thread already has a running async loop, ``AsyncToSync`` can't run things
-  on that loop if it's blocked on synchronous code that is above you in the
-  call stack.
-
-The first compromise you get to might be that ``thread_sensitive`` code should
-just run in the same thread and not spawn in a sub-thread, fulfilling the first
-restriction, but that immediately runs you into the second restriction.
-
-The only real solution is to essentially have a variant of ThreadPoolExecutor
-that executes any ``thread_sensitive`` code on the outermost synchronous
-thread - either the main thread, or a single spawned subthread.
-
-This means you now have two basic states:
-
-* If the outermost layer of your program is synchronous, then all async code
-  run through ``AsyncToSync`` will run in a per-call event loop in arbitrary
-  sub-threads, while all ``thread_sensitive`` code will run in the main thread.
-
-* If the outermost layer of your program is asynchronous, then all async code
-  runs on the main thread's event loop, and all ``thread_sensitive`` synchronous
-  code will run in a single shared sub-thread.
-
-Crucially, this means that in both cases there is a thread which is a shared
-resource that all ``thread_sensitive`` code must run on, and there is a chance
-that this thread is currently blocked on its own ``AsyncToSync`` call. Thus,
-``AsyncToSync`` needs to act as an executor for thread code while it's blocking.
-
-The ``CurrentThreadExecutor`` class provides this functionality; rather than
-simply waiting on a Future, you can call its ``run_until_future`` method and
-it will run submitted code until that Future is done. This means that code
-inside the call can then run code on your thread.
-
-
-Maintenance and Security
-------------------------
-
-To report security issues, please contact security@djangoproject.com. For GPG
-signatures and more security process information, see
-https://docs.djangoproject.com/en/dev/internals/security/.
-
-To report bugs or request new features, please open a new GitHub issue.
-
-This repository is part of the Channels project. For the shepherd and maintenance team, please see the
-`main Channels readme <https://github.com/django/channels/blob/master/README.rst>`_.
+Documentation is hosted on [Read The Docs](https://mysqlclient.readthedocs.io/)
