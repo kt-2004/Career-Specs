@@ -1,0 +1,86 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<!-- section -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+{% csrf_token %}
+<script>
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+$(document).ready(function() {
+    // Fetch scores from the HTML and calculate recommendation 
+    let scores = [
+        {% for i in subjects.items %}
+        {"{{i.0}}" : "{{i.1}}"},
+        {% endfor %}
+    ];
+
+    // Add your recommendation logic here
+    const recommendedCourse = recommendCourse(scores);
+
+    // Display the recommended course
+    const csrftoken = getCookie('csrftoken');
+    data = JSON.stringify({
+        courses: recommendedCourse
+    })
+    let response = fetch("http://127.0.0.1:8000/rec/", {
+        method: 'POST',
+        body: data,
+        headers: {'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        "X-CSRFToken": csrftoken}
+    });
+    console.log(response)
+    if(!window.location.hash) {
+        sleep(500).then(() => {
+            window.location = window.location + '#loaded';
+            window.location.reload();
+        })
+    }
+})
+//This script of csrf token used here is for getting same result with course on myprofile..
+</script>
+<script src="{% static 'js/result.js' %} "></script>
+<div class="section layout_padding contact_section" style="background-image: url('../static/images/prof3.jpg');background-size:cover; -webkit-text-fill-color:midnightblue;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <table>
+                    <tr>
+                        <td>
+                            <h1 style="background: transparent; border-radius: 7px;"><b>Your Percentage:{{percentage}}%</b></h1>
+                            <h2 style="background: transparent; border-radius: 7px; "><b>{{info}} {{score}}</b></h2>
+                        </td>
+                    </tr>
+                    <tr style="display: flex;flex-wrap: wrap;">
+                        <td>
+                            {% for i in subjects.items %}
+                            <h3 style="background: transparent; border-radius: 7px; ">{{i.0}} : {{i.1}}</h3>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <h2 id="recommended-course" style="background: transparent; border-radius: 7px;"><b>Recommended Courses And Their Leading Colleges:</b></h2>
+                            <!--college details to show  with college-->
+                            {% for stream in streams.items %}
+                            <details style="margin: 1%;">
+                            <summary><h1 style="font-weight: bolder;display: inline;">{{stream.0}}</h1></summary>
+                            {% for college in stream.1 %}
+                            <details style="margin: 1%;-webkit-text-fill-color:black;">
+                            <summary ><h2 style="display: inline;">{{college.0}}</h2></summary>
+                            <h3><b>Addres:</b> {{college.1}}</h3>
+                            <h3><b>Fees: </b>{{college.2}}</h3>
+                            <h3><b>Hostel Facillities:</b> {{college.3}}</h3>
+                            <h3><b>Placement Ratio: </b>{{college.4}}</h3>
+                            <h3><b>Transportation Facilities:</b> {{college.5}}</h3>
+                            <h3><b>Link: </b><a href="{{college.6}}">{{college.6}}</a></h3>
+                            </details>
+                            {% endfor %}
+                            </details>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
